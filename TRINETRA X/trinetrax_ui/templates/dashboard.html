@@ -1,0 +1,614 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="icon" type="image/png"
+        href="{{ url_for('static', filename='images/favicon.png') }}">
+
+  <title>TRINETRA X AI — Intelligent Safety Control Center</title>
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- PAGE LOADER -->
+<div id="pageLoader" class="page-loader">
+  <div class="loader-card">
+    <img src="{{ url_for('static', filename='images/trinetrax-ai-logo-compact.png') }}"
+         alt="TRINETRA X AI">
+    <b>TRINETRA X AI</b>
+    <span>INTELLIGENT SAFETY CONTROL CENTER</span>
+    <div class="loader-line"><i></i></div>
+    <small>Connecting to live safety services…</small>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="topbar">
+
+  <div class="brand">
+    <img src="{{ url_for('static', filename='images/trinetrax-ai-logo-compact.png') }}"
+         alt="TRINETRA X AI">
+
+    <div>
+      <strong>TRINETRA X <em>AI</em></strong>
+      <small>See • Understand • Protect</small>
+    </div>
+  </div>
+
+  <div class="top-right">
+
+    <div class="mode-switch">
+      <button id="railwayModeBtn"
+              class="active"
+              onclick="setMode('railway')">
+        🚆 Railway
+      </button>
+
+      <button id="roadModeBtn"
+              onclick="setMode('road')">
+        🚗 Road
+      </button>
+    </div>
+
+    <div class="system-chip">
+      <i id="statusDot"></i>
+      <span id="systemStatus">SYSTEM ONLINE</span>
+    </div>
+
+    <div class="clock" id="clock">--:--:--</div>
+
+    <button class="refresh-btn"
+            onclick="refreshAll()"
+            title="Refresh">
+      ↻
+    </button>
+
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero card">
+
+    <div>
+      <div class="eyebrow">AI SAFETY CONTROL CENTER</div>
+
+      <div class="mode-line">
+        <span id="modeBadge" class="badge railway">
+          RAILWAY MODE
+        </span>
+
+        <span id="zoneBadge" class="badge neutral">
+          ZONE Z001
+        </span>
+      </div>
+
+      <h1 id="heroTitle">Intelligent Railway Protection</h1>
+
+      <p id="heroSubtitle">
+        Real-time animal detection, zone-aware risk analysis
+        and safety alert routing for railway operations.
+      </p>
+
+      <div class="feature-pills">
+        <span>YOLO Detection</span>
+        <span>Zone Aware</span>
+        <span>Live Risk Engine</span>
+        <span>Actual Notifications</span>
+      </div>
+    </div>
+
+    <img class="hero-logo"
+         src="{{ url_for('static', filename='images/trinetrax-ai-logo.png') }}"
+         alt="TRINETRA X AI Intelligent Safety System">
+
+  </section>
+
+  <!-- STATISTICS -->
+  <section class="stats">
+
+    <div class="stat card">
+      <span>📹</span>
+      <div>
+        <small>TOTAL CAMERAS</small>
+        <b id="totalCameras">4</b>
+        <i>Configured sources</i>
+      </div>
+    </div>
+
+    <div class="stat card">
+      <span>🚆</span>
+      <div>
+        <small>ACTIVE TRAINS</small>
+        <b id="railwayTargets">0</b>
+        <i>Online in Z001</i>
+      </div>
+    </div>
+
+    <div class="stat card">
+      <span>🚗</span>
+      <div>
+        <small>ACTIVE VEHICLES</small>
+        <b id="roadTargets">0</b>
+        <i>Online in Z002</i>
+      </div>
+    </div>
+
+    <div class="stat alert-stat card" id="alertStat">
+      <span>!</span>
+      <div>
+        <small>CRITICAL EVENTS</small>
+        <b id="alertCount">0</b>
+        <i>Backend events this session</i>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- CAMERA MONITORING -->
+  <section class="monitor-grid">
+
+    <!-- CAMERA SOURCES -->
+    <aside class="panel card">
+
+      <div class="section-head">
+        <div>
+          <label>CAMERA SOURCES</label>
+          <h2 id="cameraHeading">Railway Cameras</h2>
+        </div>
+        <b class="count" id="cameraCount">0</b>
+      </div>
+
+      <div class="mode-summary">
+        <strong id="modeSummaryTitle">RAILWAY MODE</strong>
+        <span id="modeSummaryText">
+          Z001 • train safety monitoring
+        </span>
+      </div>
+
+      <div id="cameraList" class="camera-list">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+
+      <!-- VIDEO INPUT SOURCE -->
+      <div class="video-source-panel">
+
+        <label for="videoSourceMode">
+          VIDEO INPUT SOURCE
+        </label>
+
+        <select id="videoSourceMode"
+                class="video-source-select">
+
+          <option value="webcam">
+            Webcam / Configured Camera
+          </option>
+
+          <option value="file">
+            Video File
+          </option>
+
+        </select>
+
+        <!-- VIDEO FILE PICKER -->
+        <div id="videoFileControls"
+             class="video-file-controls hidden">
+
+          <label for="videoFileInput">
+            Select a video from your laptop
+          </label>
+
+          <input
+            type="file"
+            id="videoFileInput"
+            accept="video/*">
+
+          <button
+            type="button"
+            id="uploadVideoBtn"
+            class="stop-btn">
+
+            Upload &amp; Start Video
+
+          </button>
+
+          <small id="videoUploadStatus">
+            Select a video file to begin.
+          </small>
+
+        </div>
+
+        <small class="mini-note">
+          Choose a camera first, then select its video input source.
+        </small>
+
+      </div>
+
+      <button class="stop-btn"
+              onclick="stopCamera()">
+        ■ Stop Camera
+      </button>
+
+      <div class="mini-note">
+        <b>CAMERA SOURCE</b>
+        <span id="sourceNote">
+          Laptop Camera for the current configured source
+        </span>
+      </div>
+
+    </aside>
+
+    <!-- LIVE VIDEO -->
+    <section class="panel card live-panel">
+
+      <div class="section-head">
+        <div>
+          <label>LIVE AI MONITOR</label>
+          <h2 id="videoTitle">Select a camera</h2>
+        </div>
+
+        <span class="live-pill" id="livePill">
+          <i></i> NOT STREAMING
+        </span>
+      </div>
+
+      <div class="video-wrap" id="videoWrap">
+
+        <div class="empty-video">
+          <img src="{{ url_for('static', filename='images/trinetrax-ai-logo-compact.png') }}"
+               alt="">
+
+          <div>◉</div>
+
+          <h3>No camera selected</h3>
+
+          <p>
+            Select a camera to start real-time YOLO monitoring.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="video-footer">
+        <span id="videoZone">Zone —</span>
+        <span id="videoMode">Mode —</span>
+        <span id="videoTargets">Active targets —</span>
+      </div>
+
+    </section>
+
+    <!-- ALERT ROUTING -->
+    <aside class="panel card routing-panel">
+
+      <div class="section-head">
+        <div>
+          <label>ALERT ROUTING CENTER</label>
+          <h2>Who receives the alert?</h2>
+        </div>
+
+        <span class="live-label">
+          <i></i> ACTUAL BACKEND
+        </span>
+      </div>
+
+      <div id="routingEmpty" class="routing-empty">
+        <div class="route-icon">✓</div>
+
+        <strong>Waiting for a critical event</strong>
+
+        <span>
+          Detection → Risk Engine → Backend Notification → Recipients
+        </span>
+      </div>
+
+      <div id="routingContent" class="hidden"></div>
+
+    </aside>
+
+  </section>
+
+  <!-- ALERT FLOW -->
+  <section class="flow card">
+
+    <div class="section-head">
+      <div>
+        <label>ALERT FLOW</label>
+        <h2>Detection to recipient delivery</h2>
+      </div>
+
+      <span class="source-truth">
+        Backend source of truth
+      </span>
+    </div>
+
+    <div class="flow-row">
+
+      <div>
+        <b>📷</b>
+        <strong id="flowCamera">CAMERA</strong>
+        <span>Live source</span>
+      </div>
+
+      <i>→</i>
+
+      <div>
+        <b>🐄</b>
+        <strong id="flowDetection">ANIMAL DETECTED</strong>
+        <span>YOLO result</span>
+      </div>
+
+      <i>→</i>
+
+      <div>
+        <b>⚙</b>
+        <strong>RISK ENGINE</strong>
+        <span id="flowRisk">Waiting</span>
+      </div>
+
+      <i>→</i>
+
+      <div class="critical-node">
+        <b>🔴</b>
+        <strong id="flowCritical">CRITICAL</strong>
+        <span>Event handler</span>
+      </div>
+
+      <i>→</i>
+
+      <div>
+        <b>📡</b>
+        <strong id="flowRouting">RECIPIENTS</strong>
+        <span id="flowRecipientCount">Actual delivery</span>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- NOTIFICATION HISTORY AND EVIDENCE -->
+  <section class="lower-grid">
+
+    <!-- NOTIFICATION HISTORY -->
+    <section class="panel card history-panel">
+
+      <div class="section-head">
+        <div>
+          <label>NOTIFICATION HISTORY</label>
+          <h2>Actual delivery log</h2>
+        </div>
+
+        <button class="clear-btn"
+                onclick="clearAlerts()">
+          Clear Session
+        </button>
+      </div>
+
+      <!-- NEW: INDIVIDUAL EVENT CARDS -->
+      <div class="event-cards-section">
+
+        <div class="section-head">
+          <div>
+            <label>EVENT DETAILS</label>
+            <h3>Critical Event Cards</h3>
+          </div>
+        </div>
+
+        <div id="eventCards" class="event-cards">
+
+          <div class="empty-cell">
+            No critical events captured yet.
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- EXISTING DELIVERY TABLE -->
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>TIME</th>
+              <th>EVENT ID</th>
+              <th>RECIPIENT</th>
+              <th>TYPE</th>
+              <th>RISK</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+
+          <tbody id="historyBody">
+
+            <tr>
+              <td colspan="6" class="empty-cell">
+                No backend notifications captured in this UI session.
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- DETECTION EVIDENCE -->
+    <section class="panel card evidence-panel">
+
+      <div class="section-head">
+        <div>
+          <label>DETECTION EVIDENCE</label>
+          <h2>Latest snapshot</h2>
+        </div>
+
+        <span id="evidenceStatus" class="muted">
+          No event
+        </span>
+      </div>
+
+      <div id="evidenceContent" class="evidence-empty">
+
+        <img src="{{ url_for('static', filename='images/trinetrax-ai-logo-compact.png') }}"
+             alt="">
+
+        <span>
+          Snapshot will appear here after the backend creates a critical event.
+        </span>
+
+      </div>
+
+    </section>
+
+  </section>
+
+  <!-- ACTIVE TARGETS -->
+  <section class="targets card">
+
+    <div class="section-head">
+      <div>
+        <label>ACTIVE TARGETS</label>
+        <h2 id="operationsTitle">Railway Zone Operations</h2>
+      </div>
+
+      <span class="live-label">
+        <i></i> LIVE STATUS
+      </span>
+    </div>
+
+    <div class="target-grid">
+
+      <!-- RAILWAY ZONE -->
+      <div class="target-zone">
+
+        <div class="zone-title">
+          <span>🚆</span>
+
+          <div>
+            <b>Z001</b>
+            <h3>Railway Zone</h3>
+          </div>
+
+          <mark>RAILWAY</mark>
+        </div>
+
+        <div id="railwayTargetList"
+             class="target-list">
+        </div>
+
+      </div>
+
+      <!-- ROAD ZONE -->
+      <div class="target-zone">
+
+        <div class="zone-title">
+          <span>🚗</span>
+
+          <div>
+            <b>Z002</b>
+            <h3>Road Zone</h3>
+          </div>
+
+          <mark>ROAD</mark>
+        </div>
+
+        <div id="roadTargetList"
+             class="target-list">
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- SYSTEM INFORMATION -->
+  <section class="info-grid">
+
+    <div class="card info">
+      <label>AI DETECTION</label>
+      <h3>Real-time animal recognition</h3>
+      <p>
+        Existing YOLO detection and bounding boxes remain unchanged.
+      </p>
+    </div>
+
+    <div class="card info">
+      <label>ZONE SAFETY</label>
+      <h3>Zone-wide protection</h3>
+      <p>
+        Zone-camera alerts are routed to active clients in the
+        corresponding zone. Front-camera alerts follow individual
+        routing rules.
+      </p>
+    </div>
+
+    <div class="card info">
+      <label>DELIVERY</label>
+      <h3>Actual backend result</h3>
+      <p>
+        Recipients, messages, statuses and snapshots are taken
+        from the event handler result.
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+
+  <div>
+    <img src="{{ url_for('static', filename='images/favicon.png') }}"
+         alt="">
+    <b>TRINETRA X AI</b>
+  </div>
+
+  <span>
+    Intelligent Railway &amp; Road Safety System
+  </span>
+
+  <span>
+    See • Understand • Protect
+  </span>
+
+</footer>
+
+<!-- EVENT DETAIL MODAL -->
+<div id="detailModal" class="modal hidden">
+
+  <div class="modal-card">
+
+    <button class="modal-close"
+            onclick="closeModal()">
+      ×
+    </button>
+
+    <div id="modalBody"></div>
+
+  </div>
+
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div id="toastContainer"
+     class="toast-container">
+</div>
+
+<!-- DASHBOARD JAVASCRIPT -->
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+</html>
