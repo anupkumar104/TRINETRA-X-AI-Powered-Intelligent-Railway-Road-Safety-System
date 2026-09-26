@@ -1,4 +1,5 @@
-# AI Safety System
+# TRINETRA X :AI-Powered Intelligent Railway & Road Safety System
+
 
 AI-Based Multi-Mode Animal Detection, Track/Road Monitoring & Collision Alert System.
 
